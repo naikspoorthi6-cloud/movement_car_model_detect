@@ -1,0 +1,10 @@
+{
+  "name": "Car Detection AI",
+  "description": "Mobile-friendly AI car detection application that identifies vehicle manufacturer, model, exterior color, category, and specifications using Google Gemini vision.",
+  "requestFramePermissions": [
+    "camera"
+  ],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
