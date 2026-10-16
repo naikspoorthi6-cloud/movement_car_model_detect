@@ -18,7 +18,7 @@ export async function fileToBase64(file: File | Blob): Promise<string> {
  */
 export async function optimizeImageData(
   dataUrl: string,
-  maxDimension = 1920
+  maxDimension = 1024
 ): Promise<{ base64: string; mimeType: string }> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -49,7 +49,7 @@ export async function optimizeImageData(
       }
 
       ctx.drawImage(img, 0, 0, width, height);
-      const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.88);
+      const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.82);
       resolve({
         base64: optimizedDataUrl,
         mimeType: 'image/jpeg',

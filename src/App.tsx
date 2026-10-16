@@ -400,15 +400,22 @@ export default function App() {
           </div>
         )}
 
-        {/* Scanning Loading State */}
-        {analyzing && imageSrc && (
+        {/* Scanning Loading State & Seamless Auto-Retry */}
+        {(analyzing || retryCountdown !== null) && imageSrc && (
           <div className="space-y-4 animate-in fade-in duration-200">
-            <ScanningHud imageSrc={imageSrc} />
+            <ScanningHud
+              imageSrc={imageSrc}
+              customStatus={
+                retryCountdown !== null
+                  ? `High AI Server Demand — Reconnecting in ${retryCountdown}s...`
+                  : null
+              }
+            />
           </div>
         )}
 
-        {/* Error Notification with Auto-Retry */}
-        {error && (
+        {/* Error Notification (Shown only when not actively retrying) */}
+        {error && retryCountdown === null && !analyzing && (
           <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-rose-950/60 to-slate-900 border border-rose-500/40 text-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xl">
             <div className="flex items-start sm:items-center gap-3">
               <div className="p-2.5 rounded-xl bg-rose-500/20 text-rose-400 shrink-0">

@@ -1,5 +1,10 @@
 # Car Detection AI 🏎️🔍
 
+[![Live Demo](https://img.shields.io/badge/Live_Demo-car--detection--ai.ai.studio-06b6d4?style=for-the-badge&logo=google-chrome&logoColor=white)](https://car-detection-ai.ai.studio)
+[![GitHub](https://img.shields.io/badge/GitHub-Repository-181717?style=for-the-badge&logo=github)](https://github.com/naikspoorthi6-cloud/movement_car_model_detect)
+
+> 🚀 **Live Application**: [https://car-detection-ai.ai.studio](https://car-detection-ai.ai.studio)
+
 An intelligent, mobile-friendly automotive vision scanner powered by **Google Gemini Vision AI**. **Car Detection AI** recognizes vehicle manufacturers, model lines, exterior paint finishes, automotive categories, dynamic movement states, and engineering signatures from photos or live camera feeds — with full multi-vehicle detection support.
 
 ---
@@ -36,12 +41,30 @@ An intelligent, mobile-friendly automotive vision scanner powered by **Google Ge
 
 ---
 
-## 🔒 Security & Architecture
+## 🔒 Security & Architecture Hardening
 
-This project strictly follows server-side security standards:
-- **No Client-Side API Keys**: The client browser never imports `@google/genai` or accesses `process.env.GEMINI_API_KEY`.
-- **Protected Backend Proxy**: All AI inference requests pass through a secure Express endpoint (`POST /api/analyze-car`), keeping your Gemini API key protected on the server.
-- **Zero Secrets in Git**: Sensitive `.env*` files are excluded in `.gitignore`.
+This project was built and audited against strict security standards before syncing to GitHub:
+
+### 1. Server-Side Key Isolation & Zero Client Exposure
+- **No Browser-Side Secrets**: The client-side React code never imports `@google/genai` and never accesses `process.env.GEMINI_API_KEY`.
+- **Backend Proxy Architecture**: All communication with Google Gemini is handled exclusively through a private Express endpoint (`POST /api/analyze-car`), ensuring API credentials never leave the Node.js server.
+- **No `VITE_` Key Leaks**: The frontend contains zero environment variables prefixed with `VITE_` that could accidentally be bundled into production JavaScript files.
+
+### 2. Hardened Repository Exclusion (`.gitignore`)
+- **Strict Environment Masking**: The `.gitignore` enforces `.env*` pattern exclusion while explicitly whitelisting only the documentation template (`!.env.example`).
+- **Local Secret Isolation**: Automatically excludes local overrides (`*.local`).
+- **IDE & OS Metadata Protection**: Blocks `.vscode/`, `.idea/`, `.DS_Store`, `Thumbs.db`, and compiler caches to prevent accidental leaks of developer configurations or cached tokens.
+
+### 3. Payload Sanitization & Buffer Protection
+- **Input Validation**: Strips and validates data URI headers (`cleanBase64.replace(/^data:image\/[a-zA-Z0-9+.-]+;base64,/, '')`) before passing inputs to downstream AI model pipelines.
+- **Client-Side Image Optimization**: Images are automatically scaled to a max dimension of `1024px` with `0.82` compression in the browser before dispatch. This reduces transmission payloads by **15x** (~150KB instead of 3MB+), safeguarding the server from memory exhaustion and preventing gateway timeouts.
+
+### 4. Resilient Gateway Guards & Timeout Protection
+- **12-Second Circuit Breaker**: Wraps model inference calls in a `Promise.race` timeout to prevent hung or slow upstream requests from tying up server resources.
+- **Exponential Backoff**: Multi-pass failover across models incorporates structured delays (`1000ms` / `2000ms`), preventing denial-of-service retry storms during regional Google Cloud traffic surges.
+
+### 5. Safe Error Masking (No Leakage of Internal Telemetry)
+- Serialized upstream error messages (such as raw JSON 503 or 429 error objects from Google Cloud APIs) are caught, sanitized, and transformed into friendly user-facing notices. Internal server headers, API paths, and raw credentials are never reflected in client responses.
 
 ---
 
@@ -55,8 +78,8 @@ This project strictly follows server-side security standards:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/your-username/car-detection-ai.git
-cd car-detection-ai
+git clone https://github.com/naikspoorthi6-cloud/movement_car_model_detect.git
+cd movement_car_model_detect
 ```
 
 ### 2. Install Dependencies

@@ -3,6 +3,7 @@ import { Cpu, Eye, Palette, ShieldCheck, Car } from 'lucide-react';
 
 interface ScanningHudProps {
   imageSrc: string;
+  customStatus?: string | null;
 }
 
 const SCAN_STAGES = [
@@ -13,7 +14,7 @@ const SCAN_STAGES = [
   { icon: ShieldCheck, label: 'Finalizing automotive specifications report...' },
 ];
 
-export const ScanningHud: React.FC<ScanningHudProps> = ({ imageSrc }) => {
+export const ScanningHud: React.FC<ScanningHudProps> = ({ imageSrc, customStatus }) => {
   const [currentStageIndex, setCurrentStageIndex] = useState(0);
   const [elapsed, setElapsed] = useState(0);
 
@@ -97,11 +98,13 @@ export const ScanningHud: React.FC<ScanningHudProps> = ({ imageSrc }) => {
             <CurrentIcon className="w-5 h-5 animate-bounce" />
           </div>
           <div>
-            <div className="text-xs font-mono text-cyan-400 font-semibold uppercase tracking-wider">
-              {SCAN_STAGES[currentStageIndex].label}
+            <div className={`text-xs font-mono font-semibold uppercase tracking-wider ${customStatus ? 'text-amber-400 animate-pulse' : 'text-cyan-400'}`}>
+              {customStatus || SCAN_STAGES[currentStageIndex].label}
             </div>
             <div className="text-[11px] text-slate-400">
-              Examining vehicle make, model, color code, body style & features
+              {customStatus
+                ? 'High AI traffic detected on Google servers — waiting for capacity clearance'
+                : 'Examining vehicle make, model, color code, body style & features'}
             </div>
           </div>
         </div>

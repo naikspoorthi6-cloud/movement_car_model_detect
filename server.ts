@@ -99,7 +99,7 @@ Respond strictly with valid JSON conforming to the requested schema.`;
     for (let round = 1; round <= MAX_ROUNDS && !responseText; round++) {
       for (const modelName of modelsToTry) {
         try {
-          const response = await ai.models.generateContent({
+          const generatePromise = ai.models.generateContent({
             model: modelName,
             contents: {
               parts: [
@@ -186,6 +186,12 @@ Respond strictly with valid JSON conforming to the requested schema.`;
             },
           });
 
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Timeout: ${modelName} took longer than 12s`)), 12000)
+          );
+
+          const response = await Promise.race([generatePromise, timeoutPromise]);
+
           if (response && response.text) {
             responseText = response.text;
             break; // Success!
@@ -193,14 +199,14 @@ Respond strictly with valid JSON conforming to the requested schema.`;
         } catch (err: any) {
           lastError = err;
           console.warn(`Model ${modelName} attempt (Round ${round}) failed:`, err?.message?.slice(0, 120) || err);
-          // Brief pause before trying next model
-          await new Promise((r) => setTimeout(r, 600));
+          // Wait 1000ms before trying next model to allow server capacity spike to subside
+          await new Promise((r) => setTimeout(r, 1000));
         }
       }
 
       if (!responseText && round < MAX_ROUNDS) {
-        // Wait 1.2s before next retry round
-        await new Promise((r) => setTimeout(r, 1200));
+        // Wait 2000ms before next retry round
+        await new Promise((r) => setTimeout(r, 2000));
       }
     }
 
